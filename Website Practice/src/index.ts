@@ -12,12 +12,31 @@ interface UserData {
 }
 
 // Reusable Function
-function myCustomFetcher<T>(url:string, options?:RequestInit):Promise<T>{
-
+function myCustomFetcher<T>(url: string, options?: RequestInit): Promise<T> {
+  return fetch(url, options)
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(
+          `Network Response was not OK - Status: ${response.status}`
+        );
+      }
+      return response.json();
+    })
+    .then((data) => {
+      console.log(data);
+      return data;
+    });
 }
 
-function fetchUserData(url: string){
-    myCustomFetcher<UserData[]>(url, {})
+// const showResultUI = (singleUser) => {
+
+// }
+
+function fetchUserData(url: string) {
+  myCustomFetcher<UserData[]>(url, {}).then((users)=>{
+    console.log(users.length);
+  });
 }
 
 // Default Function to Load
+fetchUserData("https://api.github.com/users");
