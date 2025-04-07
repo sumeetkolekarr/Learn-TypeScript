@@ -1,4 +1,3 @@
-"use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -35,10 +34,11 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var _this = this;
 var getUsername = document.querySelector("#user");
-var formSubmit = document.querySelector(".form");
-var main_container = document.querySelector(".main-content");
-// Reusable Function
+var formSubmit = document.querySelector("#form");
+var main_container = document.querySelector(".main_container");
+// reusable fun
 function myCustomFetcher(url, options) {
     return __awaiter(this, void 0, void 0, function () {
         var response, data;
@@ -48,17 +48,69 @@ function myCustomFetcher(url, options) {
                 case 1:
                     response = _a.sent();
                     if (!response.ok) {
-                        throw new Error("Network Response was not OK - Status: ".concat(response.status));
+                        throw new Error(" Network response was not ok - status: ".concat(response.status));
                     }
-                    data = response.json();
-                    console.log(data);
+                    return [4 /*yield*/, response.json()];
+                case 2:
+                    data = _a.sent();
+                    //   console.log(data);
                     return [2 /*return*/, data];
             }
         });
     });
 }
+// let display the card UI
+var showResultUI = function (singleUser) {
+    var avatar_url = singleUser.avatar_url, login = singleUser.login, url = singleUser.url;
+    main_container.insertAdjacentHTML("beforeend", "<div class='card'> \n    <img src=".concat(avatar_url, " alt=").concat(login, " />\n    <hr />\n    <div class=\"card-footer\">\n      <img src=\"").concat(avatar_url, "\" alt=\"").concat(login, "\" /> \n      <a href=\"").concat(url, "\"> Github </a>\n    </div>\n    </div>\n    "));
+};
+// subscribe to thapa technical
 function fetchUserData(url) {
-    myCustomFetcher(url, {});
+    myCustomFetcher(url, {}).then(function (userInfo) {
+        for (var _i = 0, userInfo_1 = userInfo; _i < userInfo_1.length; _i++) {
+            var singleUser = userInfo_1[_i];
+            showResultUI(singleUser);
+            console.log("login " + singleUser.login);
+        }
+    });
 }
-// Default Function to Load
-fetchUserData('https://api.github.com/users');
+// default fun call
+fetchUserData("https://api.github.com/users");
+// let perform search fun
+formSubmit.addEventListener("submit", function (e) { return __awaiter(_this, void 0, void 0, function () {
+    var searchTerm, url, allUserData, matchingUsers, _i, matchingUsers_1, singleUser, error_1;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                e.preventDefault();
+                searchTerm = getUsername.value.toLowerCase();
+                _a.label = 1;
+            case 1:
+                _a.trys.push([1, 3, , 4]);
+                url = "https://api.github.com/users";
+                return [4 /*yield*/, myCustomFetcher(url, {})];
+            case 2:
+                allUserData = _a.sent();
+                matchingUsers = allUserData.filter(function (user) {
+                    return user.login.toLowerCase().includes(searchTerm);
+                });
+                // we need to clear the previous data
+                main_container.innerHTML = "";
+                if (matchingUsers.length === 0) {
+                    main_container === null || main_container === void 0 ? void 0 : main_container.insertAdjacentHTML("beforeend", "<p class=\"empty-msg\">No matching users found.</p>");
+                }
+                else {
+                    for (_i = 0, matchingUsers_1 = matchingUsers; _i < matchingUsers_1.length; _i++) {
+                        singleUser = matchingUsers_1[_i];
+                        showResultUI(singleUser);
+                    }
+                }
+                return [3 /*break*/, 4];
+            case 3:
+                error_1 = _a.sent();
+                console.log(error_1);
+                return [3 /*break*/, 4];
+            case 4: return [2 /*return*/];
+        }
+    });
+}); });
